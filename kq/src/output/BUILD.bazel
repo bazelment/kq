@@ -1,0 +1,34 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+# Output library - result formatting
+rust_library(
+    name = "output",
+    crate_name = "kq_output",
+    crate_root = "mod.rs",
+    srcs = [
+        "mod.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src/cli:cli",
+        "//kq/src/schema:schema",
+        "@crates//:anyhow",
+        "@crates//:arrow-array",
+        "@crates//:arrow-schema",
+        "@crates//:chrono",
+        "@crates//:colored",
+        "@crates//:comfy-table",
+        "@crates//:csv",
+        "@crates//:serde_json",
+    ],
+)
+
+# Unit tests for output library
+rust_test(
+    name = "output_test",
+    crate = ":output",
+    deps = [
+        "@crates//:tempfile",
+    ],
+)
+

@@ -1,0 +1,85 @@
+load("@rules_rust//rust:defs.bzl", "rust_test")
+
+# Golden test data files
+exports_files([
+    "golden_pod_with_affinity.json",
+    "golden_node.json",
+    "golden_namespace.json",
+    "golden_daemonset.json",
+])
+
+# Test targets
+rust_test(
+    name = "integration_loader_progress_tests",
+    srcs = ["integration_loader_progress_tests.rs"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:flate2",
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+        "@crates//:tokio",
+        "@crates//:tracing-subscriber",
+    ],
+)
+
+rust_test(
+    name = "loader_advanced_tests",
+    srcs = ["loader_advanced_tests.rs"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:flate2",
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+        "@crates//:tokio",
+        "@crates//:tracing-subscriber",
+    ],
+)
+
+rust_test(
+    name = "loader_tests",
+    srcs = ["loader_tests.rs"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:flate2",
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+        "@crates//:tokio",
+        "@crates//:tracing-subscriber",
+    ],
+)
+
+rust_test(
+    name = "synthetic_snapshot_tests",
+    srcs = ["synthetic_snapshot_tests.rs"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:arrow-array",
+        "@crates//:chrono",
+        "@crates//:tempfile",
+        "@crates//:tokio",
+    ],
+)
+
+# End-to-end CLI tests — spawn the real kq binary and assert on stdout / exit.
+# `data` adds the binary to runfiles; `env` passes the runfiles-relative path
+# so the test can locate it via TEST_SRCDIR / TEST_WORKSPACE.
+rust_test(
+    name = "cli_e2e_tests",
+    srcs = ["cli_e2e_tests.rs"],
+    data = ["//kq/src:kq"],
+    env = {
+        "KQ_BIN_RLOC": "$(rootpath //kq/src:kq)",
+    },
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:chrono",
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+    ],
+)

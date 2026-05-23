@@ -1,0 +1,62 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+# CLI library - command-line interface types and utilities
+rust_library(
+    name = "cli",
+    crate_name = "kq_cli",
+    crate_root = "mod.rs",
+    srcs = [
+        "mod.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@crates//:clap",
+    ],
+)
+
+# Interactive CLI library - REPL interface
+rust_library(
+    name = "interactive",
+    crate_name = "kq_cli_interactive",
+    crate_root = "interactive.rs",
+    srcs = [
+        "interactive.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":cli",
+        "//kq/src/memory:memory",
+        "//kq/src/output:output",
+        "//kq/src/query:query",
+        "@crates//:anyhow",
+        "@crates//:colored",
+        "@crates//:dirs",
+        "@crates//:rustyline",
+        "@crates//:serde_json",
+        "@crates//:signal-hook",
+        "@crates//:signal-hook-tokio",
+        "@crates//:tokio",
+        "@crates//:tokio-stream",
+        "@crates//:tracing",
+    ],
+)
+
+# Unit tests for CLI libraries
+rust_test(
+    name = "cli_test",
+    crate = ":cli",
+    deps = [],
+)
+
+rust_test(
+    name = "interactive_test",
+    crate = ":interactive",
+    deps = [
+        "//kq/src/loader:loader",
+        "@crates//:chrono",
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+        "@crates//:tokio",
+    ],
+)
+

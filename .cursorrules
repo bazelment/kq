@@ -1,0 +1,22 @@
+# kq Development Notes
+
+This repository is a Rust project built with Bazel. Use Bazel targets for normal
+build and test workflows.
+
+## Common Commands
+
+```bash
+bazel build //kq/src:kq
+bazel test //kq/...
+bazel build -c opt //kq/src/bin:synthetic_query_benchmark
+```
+
+## Dependency Changes
+
+1. Add Rust crate dependencies to `Cargo.toml`.
+2. Run `CARGO_BAZEL_REPIN=1 bazel sync --only=crates`.
+3. Add the needed `@crates//:<crate>` entries to the relevant `BUILD.bazel`
+   target.
+
+Keep targets focused: each binary under `kq/src/bin` should have a documented
+operator or developer workflow.

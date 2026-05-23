@@ -1,0 +1,35 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+# Engine setup library - loads snapshots and prepares query engine
+rust_library(
+    name = "engine_setup",
+    crate_name = "kq_engine_setup",
+    crate_root = "mod.rs",
+    srcs = [
+        "mod.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src/loader:loader",
+        "//kq/src/query:query",
+        "@crates//:anyhow",
+        "@crates//:indicatif",
+        "@crates//:tracing",
+    ],
+)
+
+# Unit tests for engine_setup library
+rust_test(
+    name = "engine_setup_test",
+    crate = ":engine_setup",
+    deps = [
+        "//kq/src/schema:schema",
+        "@crates//:arrow-array",
+        "@crates//:chrono",
+        "@crates//:flate2",
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+        "@crates//:tokio",
+    ],
+)
+

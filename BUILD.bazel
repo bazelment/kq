@@ -1,0 +1,5 @@
+# Root package intentionally contains no build targets.
+#
+# kq targets live under //kq/..., for example:
+#   bazel build //kq/src:kq
+#   bazel test //kq/...

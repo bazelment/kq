@@ -1,0 +1,38 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+# Memory library - memory management utilities
+rust_library(
+    name = "memory",
+    crate_name = "kq_memory",
+    crate_root = "mod.rs",
+    srcs = [
+        "mod.rs",
+        "memory_reporter.rs",
+        "regression.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src/schema:schema",
+        "@crates//:anyhow",
+        "@crates//:arrow",
+        "@crates//:arrow-array",
+        "@crates//:bytesize",
+        "@crates//:chrono",
+        "@crates//:colored",
+        "@crates//:jemalloc-ctl",
+        "@crates//:rayon",
+        "@crates//:serde",
+        "@crates//:serde_json",
+        "@crates//:tracing",
+    ],
+)
+
+# Unit tests for memory library
+rust_test(
+    name = "memory_test",
+    crate = ":memory",
+    deps = [
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+    ],
+)

@@ -1,0 +1,140 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+# All binary targets in src/bin/
+rust_binary(
+    name = "analyze_loading_phases",
+    srcs = ["analyze_loading_phases.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:bytesize",
+        "@crates//:tokio",
+        "@crates//:tracing-subscriber",
+    ],
+)
+
+rust_binary(
+    name = "registration_hotspot_benchmark",
+    srcs = ["registration_hotspot_benchmark.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:arrow",
+        "@crates//:clap",
+        "@crates//:jemalloc-ctl",
+        "@crates//:tokio",
+        "@crates//:tracing",
+        "@crates//:tracing-subscriber",
+    ],
+)
+
+rust_binary(
+    name = "engine_setup_benchmark",
+    srcs = ["engine_setup_benchmark.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:jemallocator",
+        "@crates//:pprof",
+        "@crates//:tokio",
+        "@crates//:tracing",
+        "@crates//:tracing-subscriber",
+    ],
+)
+
+rust_binary(
+    name = "memory_regression_benchmark",
+    srcs = ["memory_regression_benchmark.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:clap",
+        "@crates//:jemallocator",
+        "@crates//:tokio",
+    ],
+)
+
+rust_binary(
+    name = "synthetic_snapshot",
+    srcs = ["synthetic_snapshot.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:clap",
+    ],
+)
+
+rust_binary(
+    name = "synthetic_query_benchmark",
+    srcs = ["synthetic_query_benchmark.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:clap",
+        "@crates//:tokio",
+    ],
+)
+
+rust_binary(
+    name = "snapshot_to_ipc",
+    srcs = [
+        "snapshot_to_ipc.rs",
+        "snapshot_convert_common.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:clap",
+    ],
+)
+
+rust_binary(
+    name = "snapshot_convert",
+    srcs = [
+        "snapshot_convert.rs",
+        "snapshot_convert_common.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:clap",
+    ],
+)
+
+rust_binary(
+    name = "snapshot_correctness",
+    srcs = ["snapshot_correctness.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:arrow-array",
+        "@crates//:clap",
+        "@crates//:tokio",
+    ],
+)
+
+rust_binary(
+    name = "snapshot_to_parquet",
+    srcs = [
+        "snapshot_to_parquet.rs",
+        "snapshot_convert_common.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src:kq_lib",
+        "@crates//:anyhow",
+        "@crates//:clap",
+    ],
+)

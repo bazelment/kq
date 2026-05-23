@@ -1,0 +1,58 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_binary", "rust_test")
+
+# Main library crate - re-exports all modules
+rust_library(
+    name = "kq_lib",
+    crate_name = "kq",
+    srcs = [
+        "lib.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src/cli:cli",
+        "//kq/src/cli:interactive",
+        "//kq/src/engine_setup:engine_setup",
+        "//kq/src/loader:loader",
+        "//kq/src/memory:memory",
+        "//kq/src/output:output",
+        "//kq/src/query:query",
+        "//kq/src/schema:schema",
+        "//kq/src/synthetic:synthetic",
+    ],
+)
+
+# Unit tests for the main library (runs #[cfg(test)] tests from lib.rs and all modules)
+rust_test(
+    name = "kq_lib_test",
+    crate = ":kq_lib",
+    deps = [
+        "@crates//:arrow-array",
+        "@crates//:chrono",
+        "@crates//:flate2",
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+        "@crates//:tokio",
+    ],
+)
+
+# Main binary
+rust_binary(
+    name = "kq",
+    srcs = ["main.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":kq_lib",
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:clap",
+        "@crates//:indicatif",
+        "@crates//:jemalloc-ctl",
+        "@crates//:jemallocator",
+        "@crates//:pprof",
+        "@crates//:serde_json",
+        "@crates//:tokio",
+        "@crates//:tracing",
+        "@crates//:tracing-subscriber",
+    ],
+)
+

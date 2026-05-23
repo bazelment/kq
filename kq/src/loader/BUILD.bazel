@@ -1,0 +1,55 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+# Loader library - loads and converts snapshot data
+rust_library(
+    name = "loader",
+    crate_name = "kq_loader",
+    crate_root = "mod.rs",
+    srcs = [
+        "mod.rs",
+        "ndjson_loader.rs",
+        "ipc_loader.rs",
+        "parquet_loader.rs",
+        "streaming_json_loader.rs",
+        "sax_json_parser.rs",
+        "resource_table.rs",
+        "phase_timing.rs",
+        "progress_reporter.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//kq/src/schema:schema",
+        "//kq/src/memory:memory",
+        "@crates//:anyhow",
+        "@crates//:arrow",
+        "@crates//:arrow-array",
+        "@crates//:arrow-json",
+        "@crates//:arrow-schema",
+        "@crates//:chrono",
+        "@crates//:dashmap",
+        "@crates//:dirs",
+        "@crates//:flate2",
+        "@crates//:indicatif",
+        "@crates//:num_cpus",
+        "@crates//:parquet",
+        "@crates//:rayon",
+        "@crates//:serde",
+        "@crates//:serde_json",
+        "@crates//:tokio",
+        "@crates//:tracing",
+    ],
+)
+
+# Unit tests for loader library
+rust_test(
+    name = "loader_test",
+    crate = ":loader",
+    deps = [
+        "@crates//:chrono",
+        "@crates//:flate2",
+        "@crates//:k8s-openapi",
+        "@crates//:serde_json",
+        "@crates//:tempfile",
+        "@crates//:tokio",
+    ],
+)

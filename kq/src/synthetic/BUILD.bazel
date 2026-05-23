@@ -1,0 +1,23 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+rust_library(
+    name = "synthetic",
+    crate_name = "kq_synthetic",
+    crate_root = "mod.rs",
+    srcs = ["mod.rs"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:flate2",
+        "@crates//:serde_json",
+    ],
+)
+
+rust_test(
+    name = "synthetic_test",
+    crate = ":synthetic",
+    deps = [
+        "@crates//:tempfile",
+    ],
+)

@@ -1,0 +1,39 @@
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+
+# Schema library - defines data structures and schemas
+rust_library(
+    name = "schema",
+    crate_name = "kq_schema",
+    crate_root = "mod.rs",
+    srcs = [
+        "mod.rs",
+        "kubernetes.rs",
+        "nested.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@crates//:arrow-schema",
+        "@crates//:chrono",
+        "@crates//:k8s-openapi",
+        "@crates//:serde",
+        "@crates//:serde_json",
+    ],
+)
+
+# Unit tests for schema library
+rust_test(
+    name = "schema_test",
+    crate = ":schema",
+    data = [
+        "//kq/tests:golden_pod_with_affinity.json",
+        "//kq/tests:golden_node.json",
+        "//kq/tests:golden_namespace.json",
+        "//kq/tests:golden_daemonset.json",
+    ],
+    deps = [
+        "@crates//:arrow-json",
+        "@crates//:tempfile",
+    ],
+)
+
+
