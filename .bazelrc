@@ -2,3 +2,10 @@
 
 # Use Bzlmod for dependency management
 common --enable_bzlmod
+
+# Persistent on-disk action cache: survives server restarts, output_base
+# wipes, and Skyframe invalidation. Lets second builds reuse expensive
+# C-from-Rust build-script outputs (jemalloc-sys, zstd-sys, etc.) even
+# after the in-memory analysis graph is gone.
+build --disk_cache=~/.cache/bazel-disk-kq
+test --disk_cache=~/.cache/bazel-disk-kq

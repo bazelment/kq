@@ -5,7 +5,7 @@ module(
 )
 
 # Rust rules for building Rust code
-bazel_dep(name = "rules_rust", version = "0.67.0")
+bazel_dep(name = "rules_rust", version = "0.70.0")
 
 # Configure Rust toolchain
 rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
