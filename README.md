@@ -28,8 +28,8 @@ below. Commands below assume Linux or macOS (use WSL on Windows) and are run
 from the repo root.
 
 ```bash
-# Build the CLI (output: bazel-bin/kq/src/kq).
-bazel build -c opt //kq/src:kq
+# Build the CLI (output: bazel-bin/kq/kq).
+bazel build -c opt //kq:kq
 
 # Capture a snapshot of your cluster. The top-level `timestamp` is required.
 # Setting `cluster` on pods and nodes (the two views with a `cluster` column)
@@ -45,12 +45,12 @@ kubectl get pods,nodes,namespaces,daemonsets --all-namespaces -o json \
   > cluster.json
 
 # Query it.
-bazel-bin/kq/src/kq --query "
+bazel-bin/kq/kq --query "
 SELECT phase, COUNT(*) AS pods FROM pods GROUP BY phase ORDER BY pods DESC
 " cluster.json
 
 # Or explore interactively.
-bazel-bin/kq/src/kq cluster.json
+bazel-bin/kq/kq cluster.json
 ```
 
 Inside the interactive shell — the startup banner lists the loaded views:
@@ -71,10 +71,10 @@ To try kq, learn the SQL, or benchmark without a real cluster, generate a
 synthetic snapshot:
 
 ```bash
-bazel run -c opt //kq/src/bin:synthetic_snapshot -- \
+bazel run -c opt //kq/tools:synthetic_snapshot -- \
   --output /tmp/kq-demo --cluster demo --nodes 100 --namespaces 20 --overwrite
 
-bazel-bin/kq/src/kq /tmp/kq-demo
+bazel-bin/kq/kq /tmp/kq-demo
 ```
 
 The generator produces deterministic, realistic clusters of any size — see

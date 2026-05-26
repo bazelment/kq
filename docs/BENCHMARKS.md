@@ -19,7 +19,7 @@ For the broader end-to-end validation flow, see
 Use this shape when you need a production-sized single-cluster snapshot:
 
 ```bash
-bazel run -c opt //kq/src/bin:synthetic_snapshot -- \
+bazel run -c opt //kq/tools:synthetic_snapshot -- \
   --output /tmp/kq-bench-5k-ndjson \
   --cluster bench-5k \
   --nodes 5000 \
@@ -37,7 +37,7 @@ generator produces and why it is deterministic.
 Convert the snapshot to the preferred repeated-load format:
 
 ```bash
-bazel run -c opt //kq/src/bin:snapshot_convert -- \
+bazel run -c opt //kq/tools:snapshot_convert -- \
   --input /tmp/kq-bench-5k-ndjson \
   --output /tmp/kq-bench-5k-ipc \
   --format ipc \
@@ -53,7 +53,7 @@ above), converts them to IPC, loads them together, registers the query engine,
 and samples peak memory during the load/registration window:
 
 ```bash
-bazel run -c opt //kq/src/bin:memory_regression_benchmark -- \
+bazel run -c opt //kq/tools:memory_regression_benchmark -- \
   --snapshot-count 4 \
   --generated-format ipc \
   --output-root /tmp/kq-memory-regression-5k \
@@ -140,7 +140,7 @@ These commands run against the `/tmp/kq-bench-5k-ipc` directory produced by the
 For quick repeatable query timings:
 
 ```bash
-bazel run -c opt //kq/src/bin:synthetic_query_benchmark -- \
+bazel run -c opt //kq/tools:synthetic_query_benchmark -- \
   --iterations 10 --warmup 2 /tmp/kq-bench-5k-ipc
 ```
 
@@ -150,7 +150,7 @@ cache, fragmentation) — a single-run load profile, not a per-phase timing
 split:
 
 ```bash
-bazel run -c opt //kq/src/bin:analyze_loading_phases -- /tmp/kq-bench-5k-ipc
+bazel run -c opt //kq/tools:analyze_loading_phases -- /tmp/kq-bench-5k-ipc
 ```
 
 ## Other Benchmark Binaries
@@ -159,7 +159,7 @@ The profiles above use IPC, the fastest repeated-load format. To benchmark
 Parquet instead, pass `--format parquet` to `snapshot_convert` and
 `--generated-format parquet` to `memory_regression_benchmark`.
 
-Two more binaries in `kq/src/bin` target narrower regressions. Both take one or
+Two more binaries in `kq/tools` target narrower regressions. Both take one or
 more snapshot paths, but their CLIs differ:
 
 ```bash
@@ -167,12 +167,12 @@ more snapshot paths, but their CLIs differ:
 # It writes a CPU profile; CPU_PROFILE sets the path (default: a .pb file in
 # the working directory), so point it under /tmp to keep the repo clean.
 CPU_PROFILE=/tmp/kq-engine-setup.pb \
-  bazel run -c opt //kq/src/bin:engine_setup_benchmark -- /tmp/kq-bench-5k-ipc
+  bazel run -c opt //kq/tools:engine_setup_benchmark -- /tmp/kq-bench-5k-ipc
 
 # Isolates DataFusion table/UDF registration cost. Prints load and register
 # timing to stdout; -o writes a metric,value summary CSV (load_time_s,
 # register_time_s, memory_delta_mb, ...).
-bazel run -c opt //kq/src/bin:registration_hotspot_benchmark -- \
+bazel run -c opt //kq/tools:registration_hotspot_benchmark -- \
   /tmp/kq-bench-5k-ipc -o /tmp/kq-registration.csv
 ```
 

@@ -1,5 +1,5 @@
 /// Analyze time spent in different loading phases
-/// Usage: bazel run -c opt //kq/src/bin:analyze_loading_phases -- /path/to/snapshot ...
+/// Usage: bazel run -c opt //kq/tools:analyze_loading_phases -- /path/to/snapshot ...
 
 use anyhow::Result;
 use kq::loader::SnapshotLoader;

@@ -11,17 +11,17 @@ How kq is structured and how to make changes safely.
 ## Repository Layout
 
 ```text
-kq/src/main.rs              CLI entry point
-kq/src/lib.rs               Public library re-exports
-kq/src/cli/                 Interactive and batch-mode CLI behavior
-kq/src/engine_setup/        Snapshot loading plus query-engine creation
-kq/src/loader/              JSON, NDJSON, Arrow IPC, and Parquet loaders
-kq/src/query/               DataFusion registration and custom UDFs
-kq/src/schema/              Arrow schemas for Kubernetes resources
-kq/src/synthetic/           Deterministic synthetic snapshot generator
-kq/src/output/              Table, JSON, CSV, TSV, and compact output formats
-kq/src/memory/              Memory reporting helpers
-kq/src/bin/                 Developer and operator helper binaries
+kq/main.rs                  CLI entry point
+kq/lib.rs                   Public library re-exports
+kq/cli/                     Interactive and batch-mode CLI behavior
+kq/engine_setup/            Snapshot loading plus query-engine creation
+kq/loader/                  JSON, NDJSON, Arrow IPC, and Parquet loaders
+kq/query/                   DataFusion registration and custom UDFs
+kq/schema/                  Arrow schemas for Kubernetes resources
+kq/synthetic/               Deterministic synthetic snapshot generator
+kq/output/                  Table, JSON, CSV, TSV, and compact output formats
+kq/memory/                  Memory reporting helpers
+kq/tools/                   Developer and operator helper binaries
 kq/tests/                   Integration tests and synthetic fixtures
 docs/                       Public usage and developer documentation
 ```
@@ -39,11 +39,11 @@ scan as DataFusion partitions without a concat copy — see
 ## Build Targets
 
 ```bash
-bazel build -c opt //kq/src:kq            # CLI
-bazel build //kq/src/bin/...              # all helper binaries
+bazel build -c opt //kq:kq                # CLI
+bazel build //kq/tools/...                # all helper binaries
 ```
 
-Helper binaries in `kq/src/bin`:
+Helper binaries in `kq/tools/`:
 
 - `synthetic_snapshot` — deterministic NDJSON snapshot generator.
 - `snapshot_convert` — NDJSON → Arrow IPC or Parquet.
@@ -70,11 +70,11 @@ focused suite documented in
 For loader, storage-format, or query-performance changes, run end-to-end
 correctness checks on synthetic data:
 
-1. Generate a synthetic NDJSON snapshot with `//kq/src/bin:synthetic_snapshot`.
-2. Convert it to both IPC and Parquet with `//kq/src/bin:snapshot_convert`.
+1. Generate a synthetic NDJSON snapshot with `//kq/tools:synthetic_snapshot`.
+2. Convert it to both IPC and Parquet with `//kq/tools:snapshot_convert`.
 3. Diff each converted snapshot against the NDJSON source with
-   `//kq/src/bin:snapshot_correctness`.
-4. Run a small `//kq/src/bin:synthetic_query_benchmark` on each.
+   `//kq/tools:snapshot_correctness`.
+4. Run a small `//kq/tools:synthetic_query_benchmark` on each.
 
 For the representative 5k-node profile and four-snapshot memory benchmark, see
 [BENCHMARKS](BENCHMARKS.md).

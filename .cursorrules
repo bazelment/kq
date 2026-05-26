@@ -6,9 +6,9 @@ build and test workflows.
 ## Common Commands
 
 ```bash
-bazel build //kq/src:kq
+bazel build //kq:kq
 bazel test //kq/...
-bazel build -c opt //kq/src/bin:synthetic_query_benchmark
+bazel build -c opt //kq/tools:synthetic_query_benchmark
 ```
 
 ## Dependency Changes
@@ -18,5 +18,5 @@ bazel build -c opt //kq/src/bin:synthetic_query_benchmark
 3. Add the needed `@crates//:<crate>` entries to the relevant `BUILD.bazel`
    target.
 
-Keep targets focused: each binary under `kq/src/bin` should have a documented
+Keep targets focused: each binary under `kq/tools` should have a documented
 operator or developer workflow.

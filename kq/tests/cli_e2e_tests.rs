@@ -19,7 +19,7 @@ use tempfile::TempDir;
 
 /// Locate the `kq` binary in Bazel test runfiles.
 ///
-/// The BUILD rule passes `KQ_BIN_RLOC=$(rootpath //kq/src:kq)`, which gives us
+/// The BUILD rule passes `KQ_BIN_RLOC=$(rootpath //kq:kq)`, which gives us
 /// a runfiles-relative path. Bazel sets `TEST_SRCDIR` to the runfiles root and
 /// `TEST_WORKSPACE` to the workspace name; the binary lives at
 /// `$TEST_SRCDIR/$TEST_WORKSPACE/$KQ_BIN_RLOC`.

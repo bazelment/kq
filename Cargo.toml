@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-path = "kq/src/lib.rs"
+path = "kq/lib.rs"
 
 [dependencies]
 anyhow = "1.0"

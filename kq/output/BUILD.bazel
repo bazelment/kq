@@ -10,8 +10,8 @@ rust_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src/cli:cli",
-        "//kq/src/schema:schema",
+        "//kq/cli:cli",
+        "//kq/schema:schema",
         "@crates//:anyhow",
         "@crates//:arrow-array",
         "@crates//:arrow-schema",

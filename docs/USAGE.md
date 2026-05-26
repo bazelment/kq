@@ -11,10 +11,10 @@ also needs `kubectl` (with cluster credentials) and `jq`. Run every command in
 this guide from the repo root, on Linux or macOS (use WSL on Windows).
 
 ```bash
-bazel build -c opt //kq/src:kq
+bazel build -c opt //kq:kq
 ```
 
-The optimized binary is written to `bazel-bin/kq/src/kq`.
+The optimized binary is written to `bazel-bin/kq/kq`.
 
 ## Capturing a Snapshot
 
@@ -70,7 +70,7 @@ Cluster](#trying-kq-without-a-cluster) — and use its path in place of
 ### One Query
 
 ```bash
-bazel-bin/kq/src/kq --query "
+bazel-bin/kq/kq --query "
 SELECT namespace, COUNT(*) AS pods
 FROM pods
 GROUP BY namespace
@@ -82,7 +82,7 @@ LIMIT 20
 ### Interactive Mode
 
 ```bash
-bazel-bin/kq/src/kq cluster.json
+bazel-bin/kq/kq cluster.json
 ```
 
 The startup banner lists the loaded views and their row counts. From the
@@ -110,7 +110,7 @@ handy for scripting and pipelines:
 
 ```bash
 printf 'SELECT COUNT(*) AS pods FROM pods;\n.quit\n' \
-  | bazel-bin/kq/src/kq --batch cluster.json
+  | bazel-bin/kq/kq --batch cluster.json
 ```
 
 The output protocol is fixed, so a parser can rely on it:
@@ -207,7 +207,7 @@ the *same* physical cluster, use distinct labels like `prod-us@monday` and
 and `nodes` views by `cluster`:
 
 ```bash
-bazel-bin/kq/src/kq --query "
+bazel-bin/kq/kq --query "
 SELECT cluster, COUNT(*) AS pods
 FROM pods
 GROUP BY cluster
@@ -241,11 +241,11 @@ with `snapshot_convert`:
 
 ```bash
 # Arrow IPC — fastest local reload.
-bazel run -c opt //kq/src/bin:snapshot_convert -- \
+bazel run -c opt //kq/tools:snapshot_convert -- \
   --input /tmp/kq-demo --output /tmp/kq-demo-ipc --format ipc --overwrite
 
 # Parquet — compact, good for durable storage and interchange.
-bazel run -c opt //kq/src/bin:snapshot_convert -- \
+bazel run -c opt //kq/tools:snapshot_convert -- \
   --input /tmp/kq-demo --output /tmp/kq-demo-parquet --format parquet --overwrite
 ```
 
@@ -258,14 +258,14 @@ names, row counts, schema fields, and key column distributions, not a full
 row-by-row equality:
 
 ```bash
-bazel run -c opt //kq/src/bin:snapshot_correctness -- \
+bazel run -c opt //kq/tools:snapshot_correctness -- \
   --expected /tmp/kq-demo --actual /tmp/kq-demo-ipc
 ```
 
 Then query the converted directory exactly as you would any snapshot:
 
 ```bash
-bazel-bin/kq/src/kq --query "SELECT COUNT(*) AS pods FROM pods" /tmp/kq-demo-ipc
+bazel-bin/kq/kq --query "SELECT COUNT(*) AS pods FROM pods" /tmp/kq-demo-ipc
 ```
 
 ## Trying kq Without a Cluster
@@ -276,7 +276,7 @@ with deterministic, realistic placement, resource requests, labels, node pools,
 namespaces, daemonsets, and pod phases:
 
 ```bash
-bazel run -c opt //kq/src/bin:synthetic_snapshot -- \
+bazel run -c opt //kq/tools:synthetic_snapshot -- \
   --output /tmp/kq-demo \
   --cluster demo \
   --nodes 1000 \
@@ -286,7 +286,7 @@ bazel run -c opt //kq/src/bin:synthetic_snapshot -- \
   --seed 42 \
   --overwrite
 
-bazel-bin/kq/src/kq /tmp/kq-demo
+bazel-bin/kq/kq /tmp/kq-demo
 ```
 
 The same flag set always produces the same cluster topology — placement,

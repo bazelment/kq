@@ -7,7 +7,7 @@ easy to verify.
 
 - Keep changes focused on Kubernetes snapshot analysis.
 - Use synthetic data in tests and docs. Generate fixtures with
-  `//kq/src/bin:synthetic_snapshot` or hand-write minimal synthetic Kubernetes
+  `//kq/tools:synthetic_snapshot` or hand-write minimal synthetic Kubernetes
   objects.
 - Do not commit real cluster snapshots, private hostnames, registry names,
   internal domains, user data, secrets, tokens, or company-specific labels.
@@ -17,7 +17,7 @@ easy to verify.
 ## Development Workflow
 
 ```bash
-bazel build -c opt //kq/src:kq
+bazel build -c opt //kq:kq
 bazel test //kq/...
 ```
 

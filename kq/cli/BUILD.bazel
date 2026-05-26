@@ -25,9 +25,9 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = [
         ":cli",
-        "//kq/src/memory:memory",
-        "//kq/src/output:output",
-        "//kq/src/query:query",
+        "//kq/memory:memory",
+        "//kq/output:output",
+        "//kq/query:query",
         "@crates//:anyhow",
         "@crates//:colored",
         "@crates//:dirs",
@@ -52,7 +52,7 @@ rust_test(
     name = "interactive_test",
     crate = ":interactive",
     deps = [
-        "//kq/src/loader:loader",
+        "//kq/loader:loader",
         "@crates//:chrono",
         "@crates//:serde_json",
         "@crates//:tempfile",

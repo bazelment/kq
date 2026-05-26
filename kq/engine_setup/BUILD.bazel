@@ -10,8 +10,8 @@ rust_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src/loader:loader",
-        "//kq/src/query:query",
+        "//kq/loader:loader",
+        "//kq/query:query",
         "@crates//:anyhow",
         "@crates//:indicatif",
         "@crates//:tracing",
@@ -23,7 +23,7 @@ rust_test(
     name = "engine_setup_test",
     crate = ":engine_setup",
     deps = [
-        "//kq/src/schema:schema",
+        "//kq/schema:schema",
         "@crates//:arrow-array",
         "@crates//:chrono",
         "@crates//:flate2",

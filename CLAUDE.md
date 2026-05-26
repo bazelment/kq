@@ -8,9 +8,9 @@ is the source of truth for crates only. The repo root has no targets;
 everything lives under `//kq/...`.
 
 ```bash
-bazel build -c opt //kq/src:kq          # optimized CLI
+bazel build -c opt //kq:kq              # optimized CLI
 bazel test //kq/...                     # all tests
-bazel test //kq/src/loader:loader_test  # single target
+bazel test //kq/loader:loader_test      # single target
 bazel test //kq/... --test_filter=name  # single test within a target
 ```
 
@@ -18,7 +18,7 @@ bazel test //kq/... --test_filter=name  # single test within a target
 
 Data flow on every CLI invocation:
 
-1. `kq/src/main.rs` parses snapshot paths + flags.
+1. `kq/main.rs` parses snapshot paths + flags.
 2. `engine_setup/` builds a `SnapshotLoader` and loads every input.
 3. `loader/` auto-detects the format per path: single `.json` / `.json.gz`,
    NDJSON directory, Arrow IPC directory, or Parquet directory. Directory
@@ -51,12 +51,12 @@ Data flow on every CLI invocation:
 Before declaring work done, run the focused suite:
 
 ```bash
-bazel test -c opt //kq/src:kq_lib_test \
-  //kq/src/cli:cli_test //kq/src/cli:interactive_test \
-  //kq/src/engine_setup:engine_setup_test \
-  //kq/src/loader:loader_test //kq/src/memory:memory_test \
-  //kq/src/output:output_test //kq/src/query:query_test \
-  //kq/src/schema:schema_test //kq/src/synthetic:synthetic_test \
+bazel test -c opt //kq:kq_lib_test \
+  //kq/cli:cli_test //kq/cli:interactive_test \
+  //kq/engine_setup:engine_setup_test \
+  //kq/loader:loader_test //kq/memory:memory_test \
+  //kq/output:output_test //kq/query:query_test \
+  //kq/schema:schema_test //kq/synthetic:synthetic_test \
   //kq/tests:synthetic_snapshot_tests
 ```
 
@@ -66,10 +66,8 @@ validation flow in
 
 ## Helper binaries
 
-Each binary in `kq/src/bin/` has a durable purpose — don't add throwaway
-scripts. The legacy `snapshot_to_ipc` / `snapshot_to_parquet` wrappers exist
-for back-compat; prefer `snapshot_convert` and don't reintroduce them in
-user-facing examples. Full list and purposes:
+Each binary in `kq/tools/` has a durable purpose — don't add throwaway
+scripts. Full list and purposes:
 [docs/DEVELOPMENT.md#build-targets](docs/DEVELOPMENT.md#build-targets).
 
 ## Other pointers

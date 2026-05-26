@@ -1,12 +1,12 @@
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 
-# All binary targets in src/bin/
+# Developer and operator helper binaries.
 rust_binary(
     name = "analyze_loading_phases",
     srcs = ["analyze_loading_phases.rs"],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:bytesize",
         "@crates//:tokio",
@@ -19,7 +19,7 @@ rust_binary(
     srcs = ["registration_hotspot_benchmark.rs"],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:arrow",
         "@crates//:clap",
@@ -35,7 +35,7 @@ rust_binary(
     srcs = ["engine_setup_benchmark.rs"],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:chrono",
         "@crates//:jemallocator",
@@ -51,7 +51,7 @@ rust_binary(
     srcs = ["memory_regression_benchmark.rs"],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:chrono",
         "@crates//:clap",
@@ -65,7 +65,7 @@ rust_binary(
     srcs = ["synthetic_snapshot.rs"],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:chrono",
         "@crates//:clap",
@@ -77,24 +77,10 @@ rust_binary(
     srcs = ["synthetic_query_benchmark.rs"],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:clap",
         "@crates//:tokio",
-    ],
-)
-
-rust_binary(
-    name = "snapshot_to_ipc",
-    srcs = [
-        "snapshot_to_ipc.rs",
-        "snapshot_convert_common.rs",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//kq/src:kq_lib",
-        "@crates//:anyhow",
-        "@crates//:clap",
     ],
 )
 
@@ -106,7 +92,7 @@ rust_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:clap",
     ],
@@ -117,24 +103,10 @@ rust_binary(
     srcs = ["snapshot_correctness.rs"],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:arrow-array",
         "@crates//:clap",
         "@crates//:tokio",
-    ],
-)
-
-rust_binary(
-    name = "snapshot_to_parquet",
-    srcs = [
-        "snapshot_to_parquet.rs",
-        "snapshot_convert_common.rs",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//kq/src:kq_lib",
-        "@crates//:anyhow",
-        "@crates//:clap",
     ],
 )

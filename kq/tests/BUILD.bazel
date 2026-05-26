@@ -13,7 +13,7 @@ rust_test(
     name = "integration_loader_progress_tests",
     srcs = ["integration_loader_progress_tests.rs"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:chrono",
         "@crates//:flate2",
@@ -28,7 +28,7 @@ rust_test(
     name = "loader_advanced_tests",
     srcs = ["loader_advanced_tests.rs"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:chrono",
         "@crates//:flate2",
@@ -43,7 +43,7 @@ rust_test(
     name = "loader_tests",
     srcs = ["loader_tests.rs"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:anyhow",
         "@crates//:chrono",
         "@crates//:flate2",
@@ -58,7 +58,7 @@ rust_test(
     name = "synthetic_snapshot_tests",
     srcs = ["synthetic_snapshot_tests.rs"],
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:arrow-array",
         "@crates//:chrono",
         "@crates//:tempfile",
@@ -72,12 +72,12 @@ rust_test(
 rust_test(
     name = "cli_e2e_tests",
     srcs = ["cli_e2e_tests.rs"],
-    data = ["//kq/src:kq"],
+    data = ["//kq:kq"],
     env = {
-        "KQ_BIN_RLOC": "$(rootpath //kq/src:kq)",
+        "KQ_BIN_RLOC": "$(rootpath //kq:kq)",
     },
     deps = [
-        "//kq/src:kq_lib",
+        "//kq:kq_lib",
         "@crates//:chrono",
         "@crates//:serde_json",
         "@crates//:tempfile",

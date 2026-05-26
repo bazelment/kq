@@ -11,8 +11,8 @@ rust_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//kq/src/loader:loader",
-        "//kq/src/schema:schema",
+        "//kq/loader:loader",
+        "//kq/schema:schema",
         "@crates//:anyhow",
         "@crates//:arrow",
         "@crates//:arrow-array",
@@ -29,8 +29,8 @@ rust_test(
     name = "query_test",
     crate = ":query",
     deps = [
-        "//kq/src/loader:loader",
-        "//kq/src/schema:schema",
+        "//kq/loader:loader",
+        "//kq/schema:schema",
         "@crates//:chrono",
         "@crates//:tempfile",
         "@crates//:tokio",
