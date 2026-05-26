@@ -80,6 +80,11 @@ bazel-bin/kq/kq /tmp/kq-demo
 The generator produces deterministic, realistic clusters of any size — see
 [Trying kq without a cluster](docs/USAGE.md#trying-kq-without-a-cluster).
 
+For a one-shot tour of multi-cluster SQL — generate N synthetic clusters and
+run seven typical fleet-investigation queries against them — run
+[`scripts/demo_synthetic_multicluster_queries.sh`](scripts/demo_synthetic_multicluster_queries.sh)
+(`--help` for options).
+
 ## Documentation
 
 - [Usage guide](docs/USAGE.md) — capturing snapshots, CLI modes, SQL syntax,

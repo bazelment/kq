@@ -299,3 +299,26 @@ wall-clock time, so `creationTimestamp` and similar fields shift between runs.
 With a fixed flag set, synthetic snapshots are safe for tests and reproducible
 benchmarks. For representative production-sized profiles, see
 [BENCHMARKS](BENCHMARKS.md).
+
+### Multi-Cluster Walkthrough
+
+[`scripts/demo_synthetic_multicluster_queries.sh`](../scripts/demo_synthetic_multicluster_queries.sh)
+generates N synthetic clusters under a chosen directory and runs seven typical
+fleet-investigation queries against all of them at once: per-cluster phase
+mix, capacity by pool, top namespaces by Running pods, failure hot spots, GPU
+node density, CPU/memory overcommit by pool, and DaemonSet rollout. It works
+both as a smoke test after a build and as a worked tour of the SQL surface.
+
+```bash
+# 4 clusters under /tmp/kq-demo-multicluster (defaults), then queries.
+scripts/demo_synthetic_multicluster_queries.sh
+
+# Re-run only the queries against the existing snapshots.
+scripts/demo_synthetic_multicluster_queries.sh --query-only
+
+# Bigger fleet, custom directory.
+scripts/demo_synthetic_multicluster_queries.sh \
+  --data-dir /tmp/kq-fleet --clusters 8 --nodes 2000
+```
+
+`--help` lists every flag.

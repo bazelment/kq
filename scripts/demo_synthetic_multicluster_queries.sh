@@ -61,6 +61,18 @@ quiet_bazel() { bazel "$@" >/dev/null 2>&1; }
 
 SCRIPT_START_NS=$(date +%s%N)
 
+# Build every binary we'll need upfront, in a single Bazel invocation, so
+# the remaining steps never pay Bazel analysis overhead. --query-only skips
+# the generator since it isn't going to run it.
+BUILD_TARGETS=( //kq:kq )
+if (( ! QUERY_ONLY )); then
+  BUILD_TARGETS+=( //kq/tools:synthetic_snapshot )
+fi
+echo "==> Building ${#BUILD_TARGETS[@]} target(s): ${BUILD_TARGETS[*]}"
+quiet_bazel build -c opt "${BUILD_TARGETS[@]}"
+KQ="$REPO_ROOT/bazel-bin/kq/kq"
+SYNTH_BIN="$REPO_ROOT/bazel-bin/kq/tools/synthetic_snapshot"
+
 if (( QUERY_ONLY )); then
   echo "==> Query-only mode: reusing snapshots under $DATA_DIR"
   for i in $(seq 1 "$CLUSTERS"); do
@@ -74,8 +86,6 @@ else
   echo "==> Generating $CLUSTERS synthetic clusters under $DATA_DIR"
   echo "    nodes=$NODES namespaces=$NAMESPACES per cluster"
   mkdir -p "$DATA_DIR"
-  quiet_bazel build -c opt //kq/tools:synthetic_snapshot
-  SYNTH_BIN="$REPO_ROOT/bazel-bin/kq/tools/synthetic_snapshot"
   for i in $(seq 1 "$CLUSTERS"); do
     name="$(cluster_name "$i")"
     out="$(cluster_path "$i")"
@@ -89,10 +99,6 @@ else
       --overwrite >/dev/null
   done
 fi
-
-echo "==> Building kq"
-quiet_bazel build -c opt //kq:kq
-KQ="$REPO_ROOT/bazel-bin/kq/kq"
 
 SNAPS=()
 for i in $(seq 1 "$CLUSTERS"); do
