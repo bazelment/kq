@@ -95,6 +95,9 @@ run seven typical fleet-investigation queries against them — run
   profiles.
 - [Contributing](CONTRIBUTING.md) — ground rules, public-data policy, PR
   checklist.
+- [Getting started as a contributor](docs/GETTING-STARTED-CONTRIBUTING.md)
+  ([中文](docs/GETTING-STARTED-CONTRIBUTING-cn.md)) — on-ramp for
+  first-time contributors with a curated list of good first projects.
 
 ## License
 

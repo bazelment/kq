@@ -3,6 +3,11 @@
 Thanks for improving kq. This project is intended to stay small, public, and
 easy to verify.
 
+New to the project? Start with the
+[Getting started as a contributor](docs/GETTING-STARTED-CONTRIBUTING.md)
+guide ([中文](docs/GETTING-STARTED-CONTRIBUTING-cn.md)) — it has a short
+architecture tour and a curated list of good first projects.
+
 ## Ground Rules
 
 - Keep changes focused on Kubernetes snapshot analysis.
