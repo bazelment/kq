@@ -81,10 +81,11 @@ impl ProgressReporter for TerminalProgressReporter {
             let icon = match phase {
                 LoadingPhase::ReadingFile => "📖",
                 LoadingPhase::ParsingJSON => "🔍",
-                LoadingPhase::ConvertingNodes | 
+                LoadingPhase::ConvertingNodes |
                 LoadingPhase::ConvertingPods |
                 LoadingPhase::ConvertingNamespaces |
-                LoadingPhase::ConvertingDaemonSets => "⚡",
+                LoadingPhase::ConvertingDaemonSets |
+                LoadingPhase::ConvertingDeployments => "⚡",
                 LoadingPhase::Finalizing => "✨",
             };
             bar.set_message(format!("{} {}", icon, message));

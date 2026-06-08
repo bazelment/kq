@@ -39,6 +39,7 @@ impl SchemaRegistry {
         self.schemas.insert("nodes".to_string(), Self::nodes_schema());
         self.schemas.insert("namespaces".to_string(), Self::namespaces_schema());
         self.schemas.insert("daemon_sets".to_string(), Self::daemon_sets_schema());
+        self.schemas.insert("deployments".to_string(), Self::deployments_schema());
     }
 
     pub fn get_schema(&self, table_name: &str) -> Option<Arc<Schema>> {
@@ -209,6 +210,28 @@ impl SchemaRegistry {
         Arc::new(Schema::new(fields))
     }
 
+    /// Schema for deployments table
+    pub fn deployments_schema() -> Arc<Schema> {
+        let fields = vec![
+            // All fields nullable for robustness
+            Field::new("name", DataType::Utf8, true),
+            Field::new("namespace", DataType::Utf8, true),
+            Field::new("uid", DataType::Utf8, true),
+            Field::new("creation_timestamp", DataType::Timestamp(TimeUnit::Millisecond, None), true),
+            Field::new("labels", DataType::Utf8, true), // JSON string for now
+            Field::new("replicas", DataType::Int32, true),
+            Field::new("ready_replicas", DataType::Int32, true),
+            Field::new("available_replicas", DataType::Int32, true),
+            Field::new("updated_replicas", DataType::Int32, true),
+            Field::new("unavailable_replicas", DataType::Int32, true),
+
+            // Hidden JSON column - contains full object JSON
+            Field::new(".json", DataType::Utf8, true),
+        ];
+
+        Arc::new(Schema::new(fields))
+    }
+
 }
 
 impl Default for SchemaRegistry {
@@ -226,11 +249,12 @@ mod tests {
         let registry = SchemaRegistry::new();
         let tables = registry.list_tables();
         
-        assert_eq!(tables.len(), 4);
+        assert_eq!(tables.len(), 5);
         assert!(tables.contains(&"pods".to_string()));
         assert!(tables.contains(&"nodes".to_string()));
         assert!(tables.contains(&"namespaces".to_string()));
         assert!(tables.contains(&"daemon_sets".to_string()));
+        assert!(tables.contains(&"deployments".to_string()));
     }
 
     #[test]
@@ -283,6 +307,7 @@ mod tests {
         assert!(tables.contains(&"nodes".to_string()));
         assert!(tables.contains(&"namespaces".to_string()));
         assert!(tables.contains(&"daemon_sets".to_string()));
+        assert!(tables.contains(&"deployments".to_string()));
     }
 
     #[test]

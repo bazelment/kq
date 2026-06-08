@@ -6,6 +6,7 @@ exports_files([
     "golden_node.json",
     "golden_namespace.json",
     "golden_daemonset.json",
+    "golden_deployment.json",
 ])
 
 # Test targets

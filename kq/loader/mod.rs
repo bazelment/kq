@@ -33,6 +33,7 @@ pub enum LoadingPhase {
     ConvertingPods,
     ConvertingNamespaces,
     ConvertingDaemonSets,
+    ConvertingDeployments,
     Finalizing,
 }
 
@@ -45,6 +46,7 @@ impl LoadingPhase {
             LoadingPhase::ConvertingPods => "Converting pods",
             LoadingPhase::ConvertingNamespaces => "Converting namespaces",
             LoadingPhase::ConvertingDaemonSets => "Converting daemonsets",
+            LoadingPhase::ConvertingDeployments => "Converting deployments",
             LoadingPhase::Finalizing => "Finalizing",
         }
     }
@@ -492,6 +494,7 @@ impl SnapshotLoader {
                 pods: None,
                 namespaces: None,
                 daemon_sets: None,
+                deployments: None,
             },
             tables: final_tables,
             table_batches,

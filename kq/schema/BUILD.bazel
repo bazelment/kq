@@ -29,6 +29,7 @@ rust_test(
         "//kq/tests:golden_node.json",
         "//kq/tests:golden_namespace.json",
         "//kq/tests:golden_daemonset.json",
+        "//kq/tests:golden_deployment.json",
     ],
     deps = [
         "@crates//:arrow-json",
