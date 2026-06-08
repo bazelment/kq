@@ -106,6 +106,8 @@ pub struct ClusterSnapshot {
     #[serde(rename = "daemonSets", default)]
     pub daemon_sets: Option<Vec<DaemonSet>>,
     pub pods: Option<Vec<Pod>>,
+    #[serde(default)]
+    pub deployments: Option<Vec<Deployment>>,
 }
 
 impl ClusterSnapshot {
@@ -116,12 +118,14 @@ impl ClusterSnapshot {
         let namespace_count = self.namespaces.as_ref().map_or(0, |n| n.len());
         let daemonset_count = self.daemon_sets.as_ref().map_or(0, |d| d.len());
         let pod_count = self.pods.as_ref().map(|p| p.len());
+        let deployment_count = self.deployments.as_ref().map_or(0, |d| d.len());
         SnapshotSummary {
             timestamp: ts,
             node_count,
             namespace_count,
             daemonset_count,
             pod_count,
+            deployment_count,
         }
     }
 }
@@ -133,6 +137,7 @@ pub struct SnapshotSummary {
     pub namespace_count: usize,
     pub daemonset_count: usize,
     pub pod_count: Option<usize>,
+    pub deployment_count: usize,
 }
 
 #[cfg(test)]
@@ -147,7 +152,8 @@ mod tests {
             "nodes": [],
             "namespaces": [],
             "daemonSets": [],
-            "pods": []
+            "pods": [],
+            "deployments": []
         }
         "#;
 
@@ -156,6 +162,7 @@ mod tests {
         assert_eq!(snapshot.namespaces.as_ref().map_or(0, |n| n.len()), 0);
         assert_eq!(snapshot.daemon_sets.as_ref().map_or(0, |d| d.len()), 0);
         assert!(snapshot.pods.is_some());
+        assert_eq!(snapshot.deployments.as_ref().map_or(0, |d| d.len()), 0);
     }
 
     #[test]
@@ -166,11 +173,13 @@ mod tests {
             namespaces: Some(vec![]),
             daemon_sets: Some(vec![]),
             pods: Some(vec![]),
+            deployments: Some(vec![]),
         };
 
         let summary = snapshot.get_summary();
         assert_eq!(summary.node_count, 0);
         assert_eq!(summary.pod_count, Some(0));
+        assert_eq!(summary.deployment_count, 0);
     }
 
     #[test]
@@ -180,6 +189,7 @@ mod tests {
         let _pod: Option<Pod> = None;
         let _namespace: Option<Namespace> = None;
         let _daemonset: Option<DaemonSet> = None;
+        let _deployment: Option<Deployment> = None;
         
         // This test ensures the types compile
         assert!(true);

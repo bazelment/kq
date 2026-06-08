@@ -346,6 +346,7 @@ impl QueryEngine {
             "nodes" => "Kubernetes nodes with capacity, allocatable resources, and conditions".to_string(),
             "namespaces" => "Kubernetes namespaces with metadata and status".to_string(),
             "daemon_sets" => "Kubernetes DaemonSets with replica status information".to_string(),
+            "deployments" => "Kubernetes Deployments with replica status information".to_string(),
             _ => format!("Kubernetes resource table: {}", table_name),
         }
     }
@@ -573,6 +574,7 @@ mod tests {
                 namespaces: Some(vec![]),
                 daemon_sets: Some(vec![]),
                 pods: Some(vec![]),
+                deployments: Some(vec![]),
             },
             tables: HashMap::new(),
             table_batches: HashMap::new(),
@@ -673,6 +675,7 @@ mod tests {
                 "status": { "phase": "Active" }
             }],
             "daemonSets": [],
+            "deployments": [],
             "pods": pods
         });
 
@@ -937,7 +940,7 @@ mod tests {
             .iter()
             .map(|table| table.name.clone())
             .collect();
-        for expected in ["pods", "nodes", "namespaces", "daemon_sets"] {
+        for expected in ["pods", "nodes", "namespaces", "daemon_sets", "deployments"] {
             assert!(
                 names.contains(expected),
                 "missing user-facing view '{expected}'; got {names:?}"

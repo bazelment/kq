@@ -30,6 +30,19 @@ const DAEMONSET_WORKLOADS: &[(&str, &str, &str)] = &[
     ("dns-node-cache", "kube-system", "dns"),
 ];
 
+const DEPLOYMENT_WORKLOADS: &[(&str, &str, i32, &str)] = &[
+    ("frontend", "production", 8, "web"),
+    ("api-gateway", "production", 5, "gateway"),
+    ("user-service", "production", 3, "services"),
+    ("payment-worker", "production", 4, "workers"),
+    ("search-indexer", "production", 2, "workers"),
+    ("notification-controller", "production", 3, "controllers"),
+    ("cache-warmer", "production", 2, "workers"),
+    ("data-processor", "production", 6, "workers"),
+    ("auth-proxy", "production", 3, "infra"),
+    ("config-controller", "production", 2, "controllers"),
+];
+
 const POOLS: &[(&str, u32)] = &[
     ("general", 58),
     ("cpu", 12),
@@ -112,6 +125,7 @@ pub struct SyntheticSnapshotSummary {
     pub pod_count: usize,
     pub namespace_count: usize,
     pub daemonset_count: usize,
+    pub deployment_count: usize,
     pub min_pods_per_node: usize,
     pub max_pods_per_node: usize,
     pub running_pods: usize,
@@ -237,6 +251,7 @@ pub fn generate_ndjson_snapshot(config: &SyntheticSnapshotConfig) -> Result<Synt
 
     write_namespaces(config, &namespace_names)?;
     write_daemonsets(config)?;
+    write_deployments(config)?;
 
     let nodes_path = config.output_dir.join("nodes.ndjson.gz");
     let pods_path = config.output_dir.join("pods.ndjson.gz");
@@ -298,6 +313,7 @@ pub fn generate_ndjson_snapshot(config: &SyntheticSnapshotConfig) -> Result<Synt
         pod_count,
         namespace_count: namespace_names.len(),
         daemonset_count: DAEMONSET_WORKLOADS.len(),
+        deployment_count: DEPLOYMENT_WORKLOADS.len(),
         min_pods_per_node: observed_min,
         max_pods_per_node: observed_max,
         running_pods,
@@ -367,6 +383,7 @@ fn write_metadata(config: &SyntheticSnapshotConfig, summary: &SyntheticSnapshotS
         "pods": summary.pod_count,
         "namespaces": summary.namespace_count,
         "daemonSets": summary.daemonset_count,
+        "deployments": summary.deployment_count,
         "podsPerNode": {
             "min": summary.min_pods_per_node,
             "max": summary.max_pods_per_node
@@ -459,6 +476,100 @@ fn write_daemonsets(config: &SyntheticSnapshotConfig) -> Result<()> {
             "ready_percentage": if desired > 0 { (ready as f32 / desired as f32) * 100.0 } else { 0.0 }
         });
         write_json_line(&mut writer, &daemonset)?;
+    }
+    finish_gzip_writer(writer)
+}
+
+fn write_deployments(config: &SyntheticSnapshotConfig) -> Result<()> {
+    let path = config.output_dir.join("deployments.ndjson.gz");
+    let mut writer = gzip_line_writer(&path)?;
+    for (idx, (name, namespace, replicas, component)) in DEPLOYMENT_WORKLOADS.iter().enumerate() {
+        let ready = if idx % 7 == 0 { replicas - 1 } else { *replicas };
+        let available = ready;
+        let updated = replicas;
+        let deployment = json!({
+            "metadata": {
+                "name": name,
+                "namespace": namespace,
+                "uid": stable_uid(&config.cluster_name, "deployment", idx),
+                "creationTimestamp": format_timestamp(config.timestamp - Duration::days(90 - (idx % 30) as i64)),
+                "labels": {
+                    "app": name,
+                    "app.kubernetes.io/name": name,
+                    "app.kubernetes.io/component": component,
+                    "app.kubernetes.io/part-of": "production-services",
+                    "synthetic.kq.dev/cluster": config.cluster_name,
+                    "workload.kq.dev/kind": "Deployment"
+                },
+                "annotations": {
+                    "deployment.kubernetes.io/revision": format!("{}", 10 + idx),
+                    "prometheus.io/scrape": "true",
+                    "prometheus.io/port": "9090"
+                }
+            },
+            "spec": {
+                "replicas": replicas,
+                "revisionHistoryLimit": 10,
+                "selector": {
+                    "matchLabels": {
+                        "app": name
+                    }
+                },
+                "strategy": {
+                    "type": "RollingUpdate",
+                    "rollingUpdate": {
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    }
+                },
+                "template": {
+                    "spec": {
+                        "containers": [{
+                            "name": name,
+                            "image": format!("registry.kq.dev/production/{}:1.{}.{}", name, idx, replicas),
+                            "resources": {
+                                "requests": {
+                                    "cpu": "200m",
+                                    "memory": "256Mi"
+                                },
+                                "limits": {
+                                    "cpu": "500m",
+                                    "memory": "512Mi"
+                                }
+                            }
+                        }]
+                    }
+                }
+            },
+            "status": {
+                "observedGeneration": 1,
+                "replicas": replicas,
+                "updatedReplicas": updated,
+                "readyReplicas": ready,
+                "availableReplicas": available,
+                "unavailableReplicas": replicas - available,
+                "conditions": [
+                    {
+                        "type": "Available",
+                        "status": if available > 0 { "True" } else { "False" },
+                        "reason": "MinimumReplicasAvailable",
+                        "message": "Deployment has minimum availability.",
+                        "lastTransitionTime": format_timestamp(config.timestamp - Duration::hours((idx % 24) as i64)),
+                        "lastUpdateTime": format_timestamp(config.timestamp - Duration::minutes((idx % 60) as i64))
+                    },
+                    {
+                        "type": "Progressing",
+                        "status": if updated == replicas { "True" } else { "False" },
+                        "reason": "NewReplicaSetAvailable",
+                        "message": "ReplicaSet has been successfully progressed.",
+                        "lastTransitionTime": format_timestamp(config.timestamp - Duration::hours((idx % 12) as i64)),
+                        "lastUpdateTime": format_timestamp(config.timestamp - Duration::minutes((idx % 30) as i64))
+                    }
+                ]
+            },
+            "ready_percentage": if *replicas > 0 { (ready as f32 / *replicas as f32) * 100.0 } else { 0.0 }
+        });
+        write_json_line(&mut writer, &deployment)?;
     }
     finish_gzip_writer(writer)
 }
@@ -1367,6 +1478,7 @@ mod tests {
         assert!(config.output_dir.join("pods.ndjson.gz").exists());
         assert!(config.output_dir.join("namespaces.ndjson.gz").exists());
         assert!(config.output_dir.join("daemonsets.ndjson.gz").exists());
+        assert!(config.output_dir.join("deployments.ndjson.gz").exists());
     }
 
     #[test]
@@ -1429,6 +1541,7 @@ mod tests {
 
         for file in [
             "daemonsets.ndjson.gz",
+            "deployments.ndjson.gz",
             "namespaces.ndjson.gz",
             "nodes.ndjson.gz",
             "pods.ndjson.gz",

@@ -1,0 +1,79 @@
+{
+    "metadata": {
+        "name": "frontend",
+        "namespace": "production",
+        "uid": "deployment-uid-1",
+        "creationTimestamp": "2024-01-01T12:00:00Z",
+        "labels": {
+            "app": "frontend",
+            "app.kubernetes.io/name": "frontend",
+            "app.kubernetes.io/component": "web"
+        },
+        "annotations": {
+            "deployment.kubernetes.io/revision": "10"
+        }
+    },
+    "spec": {
+        "replicas": 3,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "frontend"
+            }
+        },
+        "strategy": {
+            "type": "RollingUpdate",
+            "rollingUpdate": {
+                "maxUnavailable": "25%",
+                "maxSurge": "25%"
+            }
+        },
+        "template": {
+            "spec": {
+                "containers": [
+                    {
+                        "name": "frontend",
+                        "image": "registry.kq.dev/production/frontend:1.0.3",
+                        "resources": {
+                            "requests": {
+                                "cpu": "200m",
+                                "memory": "256Mi"
+                            },
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "512Mi"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "status": {
+        "observedGeneration": 1,
+        "replicas": 3,
+        "updatedReplicas": 3,
+        "readyReplicas": 3,
+        "availableReplicas": 3,
+        "unavailableReplicas": 0,
+        "conditions": [
+            {
+                "type": "Available",
+                "status": "True",
+                "reason": "MinimumReplicasAvailable",
+                "message": "Deployment has minimum availability.",
+                "lastTransitionTime": "2024-01-01T12:00:00Z",
+                "lastUpdateTime": "2024-01-01T12:00:00Z"
+            },
+            {
+                "type": "Progressing",
+                "status": "True",
+                "reason": "NewReplicaSetAvailable",
+                "message": "ReplicaSet has been successfully progressed.",
+                "lastTransitionTime": "2024-01-01T12:00:00Z",
+                "lastUpdateTime": "2024-01-01T12:00:00Z"
+            }
+        ]
+    },
+    "ready_percentage": 100.0
+}

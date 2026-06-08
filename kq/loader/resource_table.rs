@@ -50,6 +50,14 @@ pub(crate) const RESOURCE_TABLES: &[ResourceTable] = &[
         parquet_file: "daemonsets.parquet",
         schema: NestedSchemas::daemon_sets_nested_schema,
     },
+    ResourceTable {
+        table_name: "deployments",
+        json_key: "deployments",
+        ndjson_file: "deployments.ndjson.gz",
+        ipc_file: "deployments.arrow",
+        parquet_file: "deployments.parquet",
+        schema: NestedSchemas::deployments_nested_schema,
+    },
 ];
 
 pub(crate) fn resource_for_json_key(json_key: &str) -> Option<ResourceTable> {

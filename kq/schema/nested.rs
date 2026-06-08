@@ -563,6 +563,135 @@ impl NestedSchemas {
 
         Arc::new(Schema::new(fields))
     }
+    
+    /// Enhanced deployments schema with nested structure
+    pub fn deployments_nested_schema() -> Arc<Schema> {
+        let fields = vec![
+            // Full metadata struct
+            Field::new("metadata", DataType::Struct(
+                vec![
+                    Field::new("name", DataType::Utf8, true),
+                    Field::new("namespace", DataType::Utf8, true),
+                    Field::new("uid", DataType::Utf8, true),
+                    Field::new("creationTimestamp", DataType::Timestamp(TimeUnit::Millisecond, None), true),
+                    Field::new("labels", DataType::Map(
+                        Arc::new(Field::new("entries", DataType::Struct(
+                            vec![
+                                Field::new("key", DataType::Utf8, false),
+                                Field::new("value", DataType::Utf8, true),
+                            ].into()
+                        ), false)),
+                        false
+                    ), true),
+                    Field::new("annotations", DataType::Map(
+                        Arc::new(Field::new("entries", DataType::Struct(
+                            vec![
+                                Field::new("key", DataType::Utf8, false),
+                                Field::new("value", DataType::Utf8, true),
+                            ].into()
+                        ), false)),
+                        false
+                    ), true),
+                ].into()
+            ), true),
+
+            // DeploymentSpec
+            Field::new("spec", DataType::Struct(
+                vec![
+                    Field::new("replicas", DataType::Int32, true),
+                    Field::new("minReadySeconds", DataType::Int32, true),
+                    Field::new("progressDeadlineSeconds", DataType::Int32, true),
+                    Field::new("revisionHistoryLimit", DataType::Int32, true),
+                    Field::new("paused", DataType::Boolean, true),
+                    // Label selector
+                    Field::new("selector", DataType::Struct(vec![
+                        Field::new("matchLabels", DataType::Map(
+                            Arc::new(Field::new("entries", DataType::Struct(
+                                vec![
+                                    Field::new("key", DataType::Utf8, false),
+                                    Field::new("value", DataType::Utf8, true),
+                                ].into()
+                            ), false)),
+                            false
+                        ), true),
+                        Field::new("matchExpressions", DataType::List(
+                            Arc::new(Field::new("item", DataType::Struct(vec![
+                                Field::new("key", DataType::Utf8, true),
+                                Field::new("operator", DataType::Utf8, true),
+                                Field::new("values", DataType::List(
+                                    Arc::new(Field::new("item", DataType::Utf8, false))
+                                ), true),
+                            ].into()), true))
+                        ), true),
+                    ].into()), true),
+                    // Strategy
+                    Field::new("strategy", DataType::Struct(vec![
+                        Field::new("type", DataType::Utf8, true),
+                        Field::new("rollingUpdate", DataType::Struct(vec![
+                            Field::new("maxUnavailable", DataType::Utf8, true),
+                            Field::new("maxSurge", DataType::Utf8, true),
+                        ].into()), true),
+                    ].into()), true),
+                    // Pod template — just containers for image/resource queries;
+                    // full pod details live on the pods table (join on ownerReferences).
+                    Field::new("template", DataType::Struct(vec![
+                        Field::new("spec", DataType::Struct(vec![
+                            Field::new("containers", DataType::List(
+                                Arc::new(Field::new("item", DataType::Struct(vec![
+                                    Field::new("name", DataType::Utf8, true),
+                                    Field::new("image", DataType::Utf8, true),
+                                    Field::new("resources", DataType::Struct(vec![
+                                        Field::new("requests", DataType::Map(
+                                            Arc::new(Field::new("entries", DataType::Struct(vec![
+                                                Field::new("key", DataType::Utf8, false),
+                                                Field::new("value", DataType::Utf8, true),
+                                            ].into()), false)),
+                                            false,
+                                        ), true),
+                                        Field::new("limits", DataType::Map(
+                                            Arc::new(Field::new("entries", DataType::Struct(vec![
+                                                Field::new("key", DataType::Utf8, false),
+                                                Field::new("value", DataType::Utf8, true),
+                                            ].into()), false)),
+                                            false,
+                                        ), true),
+                                    ].into()), true),
+                                ].into()), true))
+                            ), true),
+                        ].into()), true),
+                    ].into()), true),
+                ].into()
+            ), true),
+
+            // DeploymentStatus
+            Field::new("status", DataType::Struct(
+                vec![
+                    Field::new("observedGeneration", DataType::Int64, true),
+                    Field::new("replicas", DataType::Int32, true),
+                    Field::new("updatedReplicas", DataType::Int32, true),
+                    Field::new("readyReplicas", DataType::Int32, true),
+                    Field::new("availableReplicas", DataType::Int32, true),
+                    Field::new("unavailableReplicas", DataType::Int32, true),
+                    // Conditions
+                    Field::new("conditions", DataType::List(
+                        Arc::new(Field::new("item", DataType::Struct(vec![
+                            Field::new("type", DataType::Utf8, true),
+                            Field::new("status", DataType::Utf8, true),
+                            Field::new("reason", DataType::Utf8, true),
+                            Field::new("message", DataType::Utf8, true),
+                            Field::new("lastTransitionTime", DataType::Timestamp(TimeUnit::Millisecond, None), true),
+                            Field::new("lastUpdateTime", DataType::Timestamp(TimeUnit::Millisecond, None), true),
+                        ].into()), true))
+                    ), true),
+                ].into()
+            ), true),
+
+            // Derived
+            Field::new("ready_percentage", DataType::Float32, true),
+        ];
+
+        Arc::new(Schema::new(fields))
+    }
 }
 
 #[cfg(test)]
@@ -684,6 +813,28 @@ mod tests {
             batch_count += 1;
         }
         
+        assert!(batch_count > 0, "Should have parsed at least one batch");
+    }
+
+    /// Test parsing a synthetic deployment JSON.
+    #[test]
+    fn test_parse_golden_deployment() {
+        let schema = NestedSchemas::deployments_nested_schema();
+        let golden_file = File::open("kq/tests/golden_deployment.json")
+            .expect("Golden file should exist");
+        let buf_reader = BufReader::new(golden_file);
+
+        let json_reader = ReaderBuilder::new(schema.clone())
+            .build(buf_reader)
+            .expect("Should build JSON reader");
+
+        let mut batch_count = 0;
+        for batch_result in json_reader {
+            let batch = batch_result.expect("Should parse batch successfully");
+            assert!(batch.num_rows() > 0, "Batch should have rows");
+            batch_count += 1;
+        }
+
         assert!(batch_count > 0, "Should have parsed at least one batch");
     }
 }
