@@ -14,5 +14,8 @@ bazel-*
 Thumbs.db
 ._*
 
+# Rust
+target/
+
 # Logs
 *.log

@@ -78,6 +78,15 @@ pub use k8s_openapi::apimachinery::pkg::apis::meta::v1::{
     // LabelSelectorRequirement,
 };
 
+// Apps v1 - Deployment
+pub use k8s_openapi::api::apps::v1::{
+      Deployment,
+      DeploymentSpec,
+      DeploymentStatus,
+      DeploymentCondition,
+      DeploymentStrategy,
+};
+
 // Note: ResourceList is now a BTreeMap<String, Quantity>
 // We'll keep a type alias for compatibility with our converters
 pub use k8s_openapi::apimachinery::pkg::api::resource::Quantity;
